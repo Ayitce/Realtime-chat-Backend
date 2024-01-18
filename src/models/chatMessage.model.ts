@@ -19,17 +19,23 @@ const ChatMessage = new mongoose.Schema(
 
 export default mongoose.model('ChatMessage', ChatMessage)
 
-export const createPostInChatRoom = async (chatRoomId, message, postedByUser) => {
+export const createPostInChatRoom = async (chatRoomId, message, postedByUser:string) => {
     try {
+        const postedBy = await mongoose.model('User').findOne({ _id: postedByUser });
+        const chatRoomInfo = await mongoose.model('ChatRoom').findOne({ _id: chatRoomId });
+        console.log("postby: " + postedByUser)
+        console.log("chatinit: " + chatRoomInfo.chatInitiator)
+        console.log(chatRoomInfo.chatInitiator != postedByUser)
+        if (!chatRoomInfo.userIds.includes(postedByUser) && chatRoomInfo.chatInitiator != postedByUser) {
+            throw new Error('user does not belong to the chat room')
+        }
+        const userProfile = await mongoose.model('User').find({ _id: { $in: chatRoomInfo.userIds } });
         const post = await mongoose.model('ChatMessage').create({
             chatRoomId: chatRoomId,
             message: message,
             postedByUser: postedByUser
         })
 
-        const postedBy = await mongoose.model('User').findOne({ _id: postedByUser });
-        const chatRoomInfo = await mongoose.model('ChatRoom').findOne({ _id: chatRoomId });
-        const userProfile = await mongoose.model('User').find({ _id: { $in: chatRoomInfo.userIds } });
         const postObject = {
             _id: post._id,
             postedByUser: postedBy,

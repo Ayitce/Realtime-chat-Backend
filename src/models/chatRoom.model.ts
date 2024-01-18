@@ -22,7 +22,21 @@ const ChatRoom = new mongoose.Schema(
 
 export default mongoose.model('ChatRoom', ChatRoom)
 
-export const initiateChat = async (userIds, chatInitiator) => {
+export const initiateChat = async (roomName, chatInitiator) => {
+    try {
+        const room = await mongoose.model('ChatRoom').create({
+            userIds: [],
+            chatInitiator: chatInitiator,
+            isAvailable: true,
+            roomName: roomName
+        })
+        return room
+    } catch (error) {
+        console.log('error on start chat method', error);
+        throw error;
+    }
+}
+export const initiateChatWithOtherUsers = async (userIds, chatInitiator) => {
     try {
         const availableRoom = await mongoose.model('ChatRoom').findOne({
             userIds: {
@@ -64,8 +78,42 @@ export const getChatRoomByRoomId = async (roomId: string) => {
 
 export const joinChatRoom = async (roomId: string, userId: string) => {
     try {
-        const room = await mongoose.model('ChatRoom').findOneAndUpdate({ _id: roomId }, { $push: { userIds: userId } });
+        const room = await mongoose.model('ChatRoom').findOneAndUpdate({ _id: roomId, chatInitiator: { $ne: userId }, userIds: { $nin: [userId] } }, { $push: { userIds: userId } });
         return room
+    } catch (err) {
+        throw new Error((err as Error).message);
+    }
+}
+
+export const exitRoom = async (roomId: string, userId: string) => {
+    try {
+        const room = await mongoose.model('ChatRoom').findOne({ _id: roomId });
+        let updatedRoom;
+        if (room.chatInitiator === userId) {
+            room.isAvailable = false
+            updatedRoom = await mongoose.model('ChatRoom').findOneAndUpdate({ _id: roomId }, room);
+        } else {
+            updatedRoom = await mongoose.model('ChatRoom').findOneAndUpdate({ _id: roomId }, { $pull: { userIds: userId } });
+        }
+        return updatedRoom
+    } catch (err) {
+        throw new Error((err as Error).message);
+    }
+}
+
+export const getAllChatRooms = async () => {
+    try {
+        const rooms = await mongoose.model('ChatRoom').find();
+        return rooms
+    } catch (err) {
+        throw new Error((err as Error).message);
+    }
+}
+
+export const getAllChatRoomCreatedByUser = async (userId: string) => {
+    try {
+        const rooms = await mongoose.model('ChatRoom').find({ chatInitiator: userId });
+        return rooms
     } catch (err) {
         throw new Error((err as Error).message);
     }
