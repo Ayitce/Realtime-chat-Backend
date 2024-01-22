@@ -3,12 +3,12 @@ import { joinChatRoom, getConversationByRoomId, initiateChatRoomWithOtherUsers, 
 import { getUser } from '../middlewares/auth.middleware';
 const router = express.Router();
 
-router.post("/initiate", initiateChatRoom)
-router.post("/initiate-with-users", initiateChatRoomWithOtherUsers)
-router.post("/:roomId/message", postMessageInChatRoom)
+router.post("/initiate", getUser, initiateChatRoom)
+router.post("/initiate-with-users", getUser, initiateChatRoomWithOtherUsers)
+router.post("/:roomId/message", getUser, postMessageInChatRoom)
 router.get("/:roomId", getConversationByRoomId)
-router.put("/:roomId", joinChatRoom)
-router.put("/:roomId/exit", exitChatRoom)
+router.put("/:roomId", getUser, joinChatRoom)
+router.put("/:roomId/exit", getUser, exitChatRoom)
 router.get("/", getAllChatRooms)
 router.get("/user/:userId", getAllChatRoomCreatedByUser)
 export default router;

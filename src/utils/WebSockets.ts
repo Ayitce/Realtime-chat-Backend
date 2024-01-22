@@ -2,6 +2,7 @@ class WebSockets {
     users = []
     connection(client) {
         console.log("a user connected")
+        console.log(client.id)
 
         client.on("disconnect", () => {
             // this.users = this.users.filter((user) => user.socketId !== client.id)
@@ -21,11 +22,22 @@ class WebSockets {
 
         client.on("unsubscribe", (room) => {
             client.leave(room)
+            client.to(room).emit("new-message", {
+                message: {
+                    _id: "TestId",
+                    postedByUser: { username: "system" },
+                    chatRoomInfo: {},
+                    userProfile: "",
+                    message: { messageText: "user exited" },
+                    chatRoomId: room
+                }
+            })
+
         })
 
         client.on("new-message", (data) => {
             client.to(data.roomId).emit("new-message", { message: data.post })
-          //  global.io.sockets.in(data.roomId).emit("new-message", { message: data.post })
+            //  global.io.sockets.in(data.roomId).emit("new-message", { message: data.post })
 
             console.log("from socket " + data)
         })
