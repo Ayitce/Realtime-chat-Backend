@@ -37,9 +37,6 @@ class WebSockets {
 
         client.on("new-message", (data) => {
             client.to(data.roomId).emit("new-message", { message: data.post })
-            //  global.io.sockets.in(data.roomId).emit("new-message", { message: data.post })
-
-            console.log("from socket " + data)
         })
     }
 

@@ -1,6 +1,6 @@
-import ChatRoom, { initiateChatWithOtherUsers, getChatRoomByRoomId, joinChatRoom, initiateChat, exitRoom, getAllChatRooms, getAllChatRoomCreatedByUser } from "../models/chatRoom.model";
+import { initiateChatWithOtherUsers, getChatRoomByRoomId, joinChatRoom, initiateChat, exitRoom, getAllChatRooms, getAllChatRoomCreatedByUser } from "../models/chatRoom.model";
 import { createPostInChatRoom, getConversationByRoomId } from "../models/chatMessage.model";
-import SocketClient, { io } from 'socket.io-client'
+import { io } from 'socket.io-client'
 
 const socket = io('http://localhost:8080');
 
@@ -29,10 +29,6 @@ export const postMessage = async (id: string, userId, messageText) => {
             messageText: messageText
         }
         const currentLoggedUser = userId
-        /* const userInRoom = await getChatRoomByRoomId(roomId);
-        if (!userInRoom.userIds.includes(currentLoggedUser)) {
-            throw new Error("wrong user try to access the room")
-        } */
         const post = await createPostInChatRoom(roomId, messagePayload, currentLoggedUser);
         console.log(post)
         // In various parts of your application
@@ -63,10 +59,6 @@ export const getConversationByRoomIdService = async (roomId: string) => {
 
 export const joinChatRoomService = async (roomId: string, userId: string) => {
     try {
-        //const roomBeforeJoin = await getChatRoomByRoomId(roomId);
-        /* if (roomBeforeJoin.userIds.includes(userId)) {
-            throw new Error("user already in the room")
-        } */
         const room = await joinChatRoom(roomId, userId);
         return room
     } catch (err) {
