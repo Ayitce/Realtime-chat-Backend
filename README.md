@@ -12,7 +12,7 @@ This is a simple realtime chat application built using Websocket (Socket.io) in 
   - join chat room
   - exit chat room
   - get all chat room
-  - get all chat room created by specific server
+  - get all chat room created by specific user
 - User authentication
   - login
   - register
