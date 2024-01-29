@@ -13,6 +13,8 @@ This is a simple realtime chat application built using Websocket (Socket.io) in 
   - exit chat room
   - get all chat room
   - get all chat room created by specific user
+  - create invite link to chat room
+  - join chat room with invite link
 - User authentication
   - login
   - register
