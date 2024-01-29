@@ -11,7 +11,6 @@ import crypto from 'crypto';
 const key = crypto.randomBytes(32);
 const algorithm = 'aes-256-cbc';
 const iv = crypto.randomBytes(16);
-const cipher = crypto.createCipheriv(algorithm, Buffer.from(key), iv);
 
 export const initiateChatService = async (roomName, chatInitiator) => {
     try {
@@ -104,9 +103,13 @@ export const getAllChatRoomCreatedByUserService = async (userId: string) => {
 
 export const getInviteLinkService = async (roomId: string) => {
     try {
+        const cipher = crypto.createCipheriv(algorithm, Buffer.from(key), iv);
+
         const expiredAt = new Date();
         expiredAt.setHours(expiredAt.getHours() + 24);
+        console.log(expiredAt)
         const roomIdWithExpireDate = `${roomId}/${expiredAt}`;
+        console.log(roomIdWithExpireDate)
 
         let encrypted = cipher.update(roomIdWithExpireDate, 'utf8', 'hex');
         encrypted += cipher.final('hex');
@@ -136,11 +139,13 @@ export const joinRoomWithInviteLinkService = async (encryptedRoomId: string, use
         console.log(`Decrypted: ${decrypted}`);
         const splitedDecrypted = decrypted.split("/");
         const roomId = splitedDecrypted[0];
+        console.log(roomId)
         const expiredAt = new Date(splitedDecrypted[1]);
         if (expiredAt < new Date()) {
             throw new Error("the link expired");
         }
         const room = await joinChatRoom(roomId, userId);
+        console.log(room)
         return room
     } catch (err) {
         console.log(err)

@@ -79,6 +79,9 @@ export const getChatRoomByRoomId = async (roomId: string) => {
 export const joinChatRoom = async (roomId: string, userId: string) => {
     try {
         const room = await mongoose.model('ChatRoom').findOneAndUpdate({ _id: roomId, chatInitiator: { $ne: userId }, userIds: { $nin: [userId] } }, { $push: { userIds: userId } });
+        if(!room){
+            throw new Error('User is already in the room');
+        }
         return room
     } catch (err) {
         throw new Error((err as Error).message);
